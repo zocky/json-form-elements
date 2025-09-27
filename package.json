@@ -4,13 +4,13 @@
   "description": "A web component library for building dynamic JSON-based forms with support for complex data structures, multiple submission behaviors, and extensible input types.",
   "author": "Zoran Obradovic <https://github.com/zocky>",
   "type": "module",
-  "main": "json-form.js",
-  "module": "json-form.js",
+  "main": "json-form-elements.js",
+  "module": "json-form-elements.js",
   "exports": {
-    ".": "./json-form.js"
+    ".": "./json-form-elements.js"
   },
   "files": [
-    "json-form.js",
+    "json-form-elements.js",
     "README.md"
   ],
   "keywords": [
