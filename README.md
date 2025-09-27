@@ -1,4 +1,4 @@
-# Json Form Components
+# Json Form Elements
 
 A web component library for building dynamic JSON-based forms with support for complex data structures, multiple submission behaviors, and extensible input types.
 
