@@ -10,17 +10,14 @@ A web component library for building dynamic JSON-based forms with support for c
 - **Framework Agnostic**: Works with any framework or vanilla JavaScript
 - **Web Standards**: Built on Custom Elements and ES modules
 
-## Installation
-
-```html
-<script type="module">
-  import { JsonForm, JsonInput, JsonInputs, JsonFieldset, JsonFieldsets, JsonSubmit } from './json-form.js';
-</script>
-```
 
 ## Basic Usage
 
 ```html
+<script type="module" src="./json-form.js">
+  
+</script>
+```
 <json-form action="/api/users" method="POST">
   <h2>Create New User</h2>
   <json-input name="username" type="text" label="Username" class="form-field"></json-input>
