@@ -1,6 +1,3 @@
-Perfect — if we’re going fully ES-module, with only `registerType` exported, we can leave the classes global (via `customElements.define`) and just provide one export for users to register new types. I’ve cleaned up the README accordingly. Here’s the complete, corrected file:
-
-````markdown
 # Json Form Components
 
 A web component library for building dynamic JSON-based forms with support for complex data structures, multiple submission behaviors, and extensible input types.
