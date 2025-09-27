@@ -1,0 +1,39 @@
+{
+  "name": "json-form-elements",
+  "version": "0.9.0",
+  "description": "A web component library for building dynamic JSON-based forms with support for complex data structures, multiple submission behaviors, and extensible input types.",
+  "author": "Zoran Obradovic <https://github.com/zocky>",
+  "type": "module",
+  "main": "json-form.js",
+  "module": "json-form.js",
+  "exports": {
+    ".": "./json-form.js"
+  },
+  "files": [
+    "json-form.js",
+    "README.md"
+  ],
+  "keywords": [
+    "web-components",
+    "custom-elements",
+    "json-form",
+    "form",
+    "shadow-dom",
+    "vanilla-js",
+    "framework-agnostic"
+  ],
+  "license": "LGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zocky/json-form-elements.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zocky/json-form-elements/issues"
+  },
+  "homepage": "https://github.com/zocky/json-form-elements#readme",
+  "browserslist": [
+    "supports custom-elements",
+    "supports shadow-dom",
+    "supports es6-module"
+  ]
+}

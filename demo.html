@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JSON Form Components Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .container {
+            position:fixed;
+            top:10px;
+            bottom:10px;
+            left:10px;
+            right:10px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            margin: 0 0 10px 0;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+        
+        .demo-grid {
+            flex:1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 70vh;
+        }
+        
+        .form-section {
+            padding: 30px;
+            overflow-y: auto;
+            
+        }
+        
+        .output-section {
+            background: #f8f9fa;
+            border-left: 1px solid #dee2e6;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .section-title {
+            color: #2c3e50;
+            margin: 0 0 20px 0;
+            font-size: 1.4em;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            background: #e9ecef;
+            border-radius: 6px;
+            padding: 4px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            background: white;
+            color: #3498db;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .json-output {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #34495e;
+        }
+        
+        .event-log {
+            background: #1a1a1a;
+            color: #4CAF50;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+        
+        .log-entry {
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+        
+        .log-timestamp {
+            color: #888;
+            margin-right: 8px;
+        }
+        
+        .log-success {
+            color: #4CAF50;
+        }
+        
+        .log-error {
+            color: #f44336;
+        }
+        
+        .log-info {
+            color: #2196F3;
+        }
+        
+        /* Custom form styling */
+        json-form {
+            display: block;
+        }
+        
+        json-input, json-inputs, json-fieldset, json-fieldsets {
+            margin-bottom: 20px;
+        }
+        
+        json-input::part(label),
+        json-inputs::part(label),
+        json-fieldset::part(label),
+        json-fieldsets::part(label) {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+        
+        json-input::part(control),
+        json-inputs::part(control) {
+            padding: 10px;
+            border: 2px solid #e1e8ed;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            background: white;
+        }
+        
+        json-input::part(control):focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        json-fieldset::part(field) {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        json-fieldset::part(label) {
+            background: #3498db;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            margin: -10px 0 16px -6px;
+            display: inline-block;
+        }
+        
+        json-submit::part(button) {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+        }
+        
+        json-submit::part(button):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(52, 152, 219, 0.4);
+        }
+        
+        json-submit::part(button):active {
+            transform: translateY(0);
+        }
+        
+        json-inputs::part(add-button),
+        json-fieldsets::part(add-button) {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 8px;
+            transition: background 0.2s;
+        }
+        
+        json-inputs::part(add-button):hover,
+        json-fieldsets::part(add-button):hover {
+            background: #229954;
+        }
+        
+        json-inputs::part(delete-button),
+        json-fieldsets::part(delete-button) {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+            transition: background 0.2s;
+        }
+        
+        json-inputs::part(delete-button):hover,
+        json-fieldsets::part(delete-button):hover {
+            background: #c0392b;
+        }
+        
+        .radio-group, .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .radio-option, .checkbox-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        
+        .demo-controls {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .control-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 8px;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+        
+        .control-button:hover {
+            background: #5a6268;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-connected {
+            background: #27ae60;
+        }
+        
+        .status-error {
+            background: #e74c3c;
+        }
+        
+        @media (max-width: 768px) {
+            .demo-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .output-section {
+                border-left: none;
+                border-top: 1px solid #dee2e6;
+            }
+            
+            .form-section, .output-section {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>JSON Form Components</h1>
+            <p>Interactive demo showcasing dynamic forms with complex data structures</p>
+        </div>
+        
+        <div class="demo-grid">
+            <div class="form-section">
+                <h2 class="section-title">Interactive Form</h2>
+                
+                <json-form id="demoForm" action="/api/demo" method="POST" response="event">
+                    <!-- Basic inputs -->
+                    <json-input name="fullName" type="text" label="Full Name" placeholder="Enter your full name" required></json-input>
+                    <json-input name="email" type="email" label="Email Address" placeholder="you@example.com" required></json-input>
+                    <json-input name="age" type="number" label="Age" min="18" max="100" value="25"></json-input>
+                    <json-input name="bio" type="textarea" label="Bio" rows="3" placeholder="Tell us about yourself..."></json-input>
+                    
+                    <!-- Selection inputs -->
+                    <json-input name="country" type="select" label="Country" required>
+                        <option value="">Select a country</option>
+                        <option value="us">United States</option>
+                        <option value="ca">Canada</option>
+                        <option value="uk">United Kingdom</option>
+                        <option value="de">Germany</option>
+                        <option value="fr">France</option>
+                        <option value="jp">Japan</option>
+                        <option value="au">Australia</option>
+                    </json-input>
+                    
+                    <json-input name="notifications" type="radio" label="Email Notifications">
+                        <option value="all">All notifications</option>
+                        <option value="important">Important only</option>
+                        <option value="none">None</option>
+                    </json-input>
+                    
+                    <json-input name="interests" type="checkboxes" label="Interests">
+                        <option value="tech">Technology</option>
+                        <option value="design">Design</option>
+                        <option value="business">Business</option>
+                        <option value="science">Science</option>
+                        <option value="arts">Arts</option>
+                        <option value="sports">Sports</option>
+                    </json-input>
+                    
+                    <!-- Array of simple values -->
+                    <json-inputs name="skills" type="text" label="Skills" placeholder="e.g., JavaScript, Python, Design..."></json-inputs>
+                    
+                    <!-- Preferences object -->
+                    <json-fieldset name="preferences" label="User Preferences">
+                        <json-input name="theme" type="select" label="Theme">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="auto">Auto</option>
+                        </json-input>
+                        <json-input name="newsletter" type="checkbox" label="Subscribe to newsletter"></json-input>
+                        <json-input name="timezone" type="text" label="Timezone" value="UTC"></json-input>
+                    </json-fieldset>
+                    
+                    <!-- Array of objects -->
+                    <json-fieldsets name="experiences" label="Work Experience">
+                        <json-input name="company" type="text" label="Company" placeholder="Company name"></json-input>
+                        <json-input name="position" type="text" label="Position" placeholder="Job title"></json-input>
+                        <json-input name="startYear" type="number" label="Start Year" min="1990" max="2024"></json-input>
+                        <json-input name="endYear" type="number" label="End Year" min="1990" max="2024"></json-input>
+                        <json-input name="current" type="checkbox" label="Current position"></json-input>
+                        <json-input name="description" type="textarea" label="Description" rows="2" placeholder="Brief description of responsibilities..."></json-input>
+                    </json-fieldsets>
+                    
+                    <json-submit name="action" value="save">💾 Save Profile</json-submit>
+                    <json-submit name="action" value="preview">👁️ Preview</json-submit>
+                </json-form>
+                
+                <div class="demo-controls">
+                    <button class="control-button" onclick="loadSampleData()">📝 Load Sample Data</button>
+                    <button class="control-button" onclick="clearForm()">🗑️ Clear Form</button>
+                    <button class="control-button" onclick="randomizeData()">🎲 Random Data</button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <h2 class="section-title">
+                    <span class="status-indicator status-connected"></span>
+                    Live Output
+                </h2>
+                
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('json')">JSON Data</button>
+                    <button class="tab" onclick="switchTab('events')">Event Log</button>
+                </div>
+                
+                <div id="jsonTab" class="tab-content active">
+                    <pre class="json-output" id="jsonOutput">{}</pre>
+                </div>
+                
+                <div id="eventsTab" class="tab-content">
+                    <div class="event-log" id="eventLog">
+                        <div class="log-entry">
+                            <span class="log-timestamp">--:--:--</span>
+                            <span class="log-info">System ready. Waiting for form interactions...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./index.js">
+    </script>
+    <script>
+
+        // Demo application logic
+        const form = document.getElementById('demoForm');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const eventLog = document.getElementById('eventLog');
+
+        // Update JSON output in real-time
+        function updateJsonOutput() {
+            try {
+                const value = form.value;
+                jsonOutput.textContent = JSON.stringify(value, null, 2);
+            } catch (e) {
+                jsonOutput.textContent = 'Error: ' + e.message;
+            }
+        }
+
+        // Log events with timestamps
+        function logEvent(type, message, data = null) {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            logEntry.innerHTML = `
+                <span class="log-timestamp">${timestamp}</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            
+            if (data) {
+                const dataEntry = document.createElement('div');
+                dataEntry.innerHTML = `<pre style="margin: 4px 0 0 80px; font-size: 11px; opacity: 0.8;">${JSON.stringify(data, null, 2)}</pre>`;
+                logEntry.appendChild(dataEntry);
+            }
+            
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Listen for form changes
+        form.addEventListener('change', (e) => {
+            updateJsonOutput();
+            logEvent('info', `Field changed: ${e.target.name || 'unnamed'}`, {
+                field: e.target.name,
+                value: e.target.value,
+                type: e.target.type || e.target.tagName.toLowerCase()
+            });
+        });
+
+        // Listen for form submissions
+        form.addEventListener('success', (e) => {
+            logEvent('success', 'Form submitted successfully!', e.detail);
+        });
+
+        form.addEventListener('error', (e) => {
+            logEvent('error', 'Form submission failed!', e.detail);
+        });
+
+        // Mock server response for demo
+        window.fetch = (url, options) => {
+            return new Promise((resolve) => {
+                setTimeout(() => {
+                    if (url === '/api/demo') {
+                        const data = JSON.parse(options.body);
+                        resolve({
+                            ok: true,
+                            headers: {
+                                get: (name) => name === 'content-type' ? 'application/json' : null
+                            },
+                            json: () => Promise.resolve({
+                                message: 'Data received successfully!',
+                                timestamp: new Date().toISOString(),
+                                action: data.action,
+                                processedFields: Object.keys(data).length
+                            })
+                        });
+                    } else {
+                        resolve({
+                            ok: false,
+                            headers: {
+                                get: () => null
+                            },
+                            text: () => Promise.resolve('Not Found')
+                        });
+                    }
+                }, 500);
+            });
+        };
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        // Demo control functions
+        function loadSampleData() {
+            const sampleData = {
+                fullName: "Jane Smith",
+                email: "jane.smith@example.com",
+                age: 28,
+                bio: "Full-stack developer with a passion for creating intuitive user experiences and scalable backend systems.",
+                country: "us",
+                notifications: "important",
+                interests: ["tech", "design", "business"],
+                skills: ["JavaScript", "Python", "React", "Node.js", "PostgreSQL"],
+                preferences: {
+                    theme: "dark",
+                    newsletter: true,
+                    timezone: "America/New_York"
+                },
+                experiences: [
+                    {
+                        company: "TechCorp Inc.",
+                        position: "Senior Frontend Developer",
+                        startYear: 2020,
+                        endYear: 2024,
+                        current: false,
+                        description: "Led frontend development for multiple web applications using React and TypeScript."
+                    },
+                    {
+                        company: "StartupXYZ",
+                        position: "Full Stack Developer",
+                        startYear: 2024,
+                        endYear: null,
+                        current: true,
+                        description: "Building next-generation SaaS platform with modern web technologies."
+                    }
+                ]
+            };
+            
+            form.value = sampleData;
+            updateJsonOutput();
+            logEvent('info', 'Sample data loaded');
+        }
+
+        function clearForm() {
+            form.value = {};
+            updateJsonOutput();
+            logEvent('info', 'Form cleared');
+        }
+
+        function randomizeData() {
+            const countries = ['us', 'ca', 'uk', 'de', 'fr', 'jp', 'au'];
+            const notifications = ['all', 'important', 'none'];
+            const interestOptions = ['tech', 'design', 'business', 'science', 'arts', 'sports'];
+            const skillOptions = ['JavaScript', 'Python', 'Java', 'C++', 'React', 'Vue', 'Angular', 'Node.js', 'Docker', 'Kubernetes'];
+            const themes = ['light', 'dark', 'auto'];
+            const companies = ['Google', 'Microsoft', 'Amazon', 'Meta', 'Apple', 'Netflix', 'Spotify', 'Airbnb'];
+            const positions = ['Software Engineer', 'Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'DevOps Engineer', 'Data Scientist'];
+
+            const randomChoice = (arr) => arr[Math.floor(Math.random() * arr.length)];
+            const randomChoices = (arr, max = 3) => {
+                const count = Math.floor(Math.random() * max) + 1;
+                const shuffled = [...arr].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, count);
+            };
+
+            const randomData = {
+                fullName: `Random User ${Math.floor(Math.random() * 1000)}`,
+                email: `user${Math.floor(Math.random() * 1000)}@example.com`,
+                age: Math.floor(Math.random() * 50) + 20,
+                bio: "Randomly generated user profile for demonstration purposes.",
+                country: randomChoice(countries),
+                notifications: randomChoice(notifications),
+                interests: randomChoices(interestOptions),
+                skills: randomChoices(skillOptions, 5),
+                preferences: {
+                    theme: randomChoice(themes),
+                    newsletter: Math.random() > 0.5,
+                    timezone: randomChoice(['UTC', 'America/New_York', 'Europe/London', 'Asia/Tokyo'])
+                },
+                experiences: Array.from({ length: Math.floor(Math.random() * 3) + 1 }, (_, i) => ({
+                    company: randomChoice(companies),
+                    position: randomChoice(positions),
+                    startYear: 2015 + Math.floor(Math.random() * 8),
+                    endYear: Math.random() > 0.3 ? 2020 + Math.floor(Math.random() * 4) : null,
+                    current: Math.random() > 0.7,
+                    description: `Random experience ${i + 1} description.`
+                }))
+            };
+            
+            form.value = randomData;
+            updateJsonOutput();
+            logEvent('info', 'Random data generated');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            updateJsonOutput();
+            logEvent('info', 'Demo application initialized');
+            
+            // Auto-update JSON output periodically to catch any missed changes
+            setInterval(updateJsonOutput, 1000);
+        });
+
+        // Make functions globally available
+        window.switchTab = switchTab;
+        window.loadSampleData = loadSampleData;
+        window.clearForm = clearForm;
+        window.randomizeData = randomizeData;
+    </script>
+</body>
+</html>
